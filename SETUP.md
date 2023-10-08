@@ -72,7 +72,14 @@ This file outlines the steps necessary for the creation of this project reposito
 - In the downloaded folder:
 	- Find the `/include` directory and copy the `/GLFW` folder to the project's `/include` directory
 	- Find `glfw3.lib` for the desired Visual Studio version and add it to `/lib`
-- Download GLAD, the GLAD1 version, from https://github.com/Dav1dde/glad
+- Download GLAD from the generator at https://glad.dav1d.de/
+	- Set the language to `C/C++`
+	- Set the speficication to `OpenGL`
+	- Set the profile to `Core`
+	- Set the version to 3.3 for GL under the API section
+	- Ensure "generate a loader" is selected
+	- Click generate
+	- Download and decompress the zip file containing two include directories, `/glad` and `/KHR`, as well as a source file, `glad.c`
 - Add `/glad` and `/KHR` to `/include`
 - Add `glad.c` to `/lib`
 - Add `glfw3.lib` and `opengl32.lib` to linker dependencies\
@@ -81,3 +88,14 @@ This file outlines the steps necessary for the creation of this project reposito
 	Additional Dependencies: glfw3.lib;opengl32.lib;$(CoreLibraryDependencies);%(AdditionalDependencies)
 	```
 - Create an OpenGL program that renders a window to ensure OpenGL is working
+
+## OpenGL Mathematics (GLM)
+
+- Download GLM from https://glm.g-truc.net/
+- Add the root directory, `/glm`, to `/include`
+
+<!--
+TODO:
+- stb_image.h
+- Assimp
+-->
