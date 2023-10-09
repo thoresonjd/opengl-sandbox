@@ -67,11 +67,16 @@ This file outlines the steps necessary for the creation of this project reposito
 
 ## Setting Up OpenGL
 
+###  Graphics Library Framework (GLFW)
+
 - Download and decompress the latest version of GLFW from https://www.glfw.org/
 	- This project uses the 64-bit Window binaries
 - In the downloaded folder:
 	- Find the `/include` directory and copy the `/GLFW` folder to the project's `/include` directory
 	- Find `glfw3.lib` for the desired Visual Studio version and add it to `/lib`
+
+### GLAD
+
 - Download GLAD from the generator at https://glad.dav1d.de/
 	- Set the language to `C/C++`
 	- Set the speficication to `OpenGL`
@@ -82,6 +87,9 @@ This file outlines the steps necessary for the creation of this project reposito
 	- Download and decompress the zip file containing two include directories, `/glad` and `/KHR`, as well as a source file, `glad.c`
 - Add `/glad` and `/KHR` to `/include`
 - Add `glad.c` to `/lib`
+
+### Visual Studio
+
 - Add `glfw3.lib` and `opengl32.lib` to linker dependencies\
 	*Project > Properties > Configuration Properties > Linker > Input*
 	```
@@ -98,4 +106,5 @@ This file outlines the steps necessary for the creation of this project reposito
 TODO:
 - stb_image.h
 - Assimp
+- Dear ImGui
 -->
