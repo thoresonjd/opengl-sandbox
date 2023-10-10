@@ -13,6 +13,9 @@
 #include <string>
 #include <ctime>
 
+/**
+ * @class Logger - Handles console and file logging
+ */
 class Logger {
 public:
 
@@ -38,6 +41,13 @@ private:
 	 */
 	std::string timestampToString(const std::tm& timestamp) const;
 
+	/**
+	 * Removes trailing whitespace from the end of a string
+	 * @param text - The string to trim
+	 * @return A substring without trailing whitespace
+	 */
+	std::string trimString(const std::string& text) const;
+
 public:
 
 	/**
@@ -56,7 +66,7 @@ public:
 	 * Logs messages to the output stream(s)
 	 * @param message - The text to log
 	 */
-	void log(const std::string& message);
+	void log(const std::string& message) const;
 };
 
 enum class Logger::Output {
@@ -102,9 +112,9 @@ Logger::~Logger() {
 	}
 }
 
-void Logger::log(const std::string& message) {
+void Logger::log(const std::string& message) const {
 	std::tm timestamp = getTimestamp();
-	std::string entry = "[" + timestampToString(timestamp) + "] " + message;
+	std::string entry = "[" + timestampToString(timestamp) + "] " + trimString(message);
 	switch (type) {
 		case Logger::Output::CONSOLE:
 		case Logger::Output::FILE:
@@ -137,6 +147,12 @@ std::string Logger::timestampToString(const std::tm& timestamp) const {
 	minute = timestamp.tm_min < 10 ? "0" + minute : minute;
 	second = timestamp.tm_sec < 10 ? "0" + second : second;
 	return year + month + day + "-" + hour + minute + second;
+}
+
+std::string Logger::trimString(const std::string& text) const {
+	std::size_t end = text.length();
+	while (std::isspace(text[--end]));
+	return text.substr(0, end + 1);
 }
 
 #endif
