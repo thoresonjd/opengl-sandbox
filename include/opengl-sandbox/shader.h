@@ -14,12 +14,17 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <opengl-sandbox/logger.h>
 
+/**
+ * @class Shader - Represents shader program functionality
+ */
 class Shader {
 private:
 
 	static const unsigned int INFO_LOG_SIZE = 512;
 	GLuint id;
+	Logger* logger = nullptr;
 
 	/**
 	 * Compiles a shader
@@ -44,7 +49,14 @@ private:
 	std::string shaderTypeToString(GLenum shaderType) const;
 
 public:
-	Shader(const char* vertexPath, const char* fragmentPath);
+
+	/**
+	 * Default constructor
+	 * @param vertexPath - The path of the vertex shader file
+	 * @param fragmentPath - The path of the fragment shader file
+	 * @param logger - A pointer to a logger to log errors
+	 */
+	Shader(const char* vertexPath, const char* fragmentPath, Logger* logger = nullptr);
 	Shader(const Shader& other) = delete;
 	Shader(Shader&& other) = delete;
 	Shader& operator=(const Shader& other) = delete;
@@ -147,7 +159,8 @@ public:
 	void setMat4(const std::string& name, const glm::mat4& mat) const;
 };
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath) {
+Shader::Shader(const char* vertexPath, const char* fragmentPath, Logger* logger) 
+	: logger(logger) {
 	std::string vShaderCode, fShaderCode;
 	std::ifstream vShaderFile, fShaderFile;
 	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -163,7 +176,8 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
 		vShaderCode = vShaderStream.str();
 		fShaderCode = fShaderStream.str();
 	} catch (std::ifstream::failure& e) {
-		std::cout << "ERROR::SHADER::FILE_READ_UNSUCCESSFULLY\n" << e.what() << std::endl;
+		if (this->logger)
+			this->logger->log("ERROR::SHADER::FILE_READ_UNSUCCESSFULLY\n" + std::string{e.what()});
 	}
 	const char* vertexCode = vShaderCode.c_str();
 	const char* fragmentCode = fShaderCode.c_str();
@@ -205,6 +219,7 @@ void Shader::setVec2(const std::string& name, const glm::vec2& value) const {
 void Shader::setVec2(const std::string& name, float x, float y) const {
 	glUniform2f(glGetUniformLocation(id, name.c_str()), x, y);
 }
+
 void Shader::setVec3(const std::string& name, const glm::vec3& value) const {
 	glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
 }
@@ -246,15 +261,15 @@ void Shader::checkCompileErrors(GLuint shader, GLenum shaderType) const {
 	GLchar infoLog[INFO_LOG_SIZE];
 	if (shaderType) {
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-		if (!success) {
+		if (!success && logger) {
 			glGetShaderInfoLog(shader, INFO_LOG_SIZE, nullptr, infoLog);
-			std::cout << "ERROR::SHADER::" << shaderTypeToString(shaderType) << "::COMPILATION_FAILED\n" << infoLog << std::endl;
+			logger->log("ERROR::SHADER::" + shaderTypeToString(shaderType) + "::COMPILATION_FAILED\n" + infoLog);
 		}
 	} else {
 		glGetProgramiv(id, GL_LINK_STATUS, &success);
-		if (!success) {
-			glGetProgramInfoLog(id, 512, nullptr, infoLog);
-			std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		if (!success && logger) {
+			glGetProgramInfoLog(id, INFO_LOG_SIZE, nullptr, infoLog);
+			logger->log("ERROR::SHADER::PROGRAM::LINKING_FAILED\n" + std::string{infoLog});
 		}
 	}
 }
