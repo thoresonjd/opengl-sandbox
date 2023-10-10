@@ -1,6 +1,6 @@
 /**
  * @file camera.h
- * @brief Camera class
+ * @brief Flying free look camera
  * @date October 2023
  */
 
@@ -10,6 +10,9 @@
 
 #include <glm/glm.hpp>
 
+/**
+ * @class Camera - Camera that can look and move around freely
+ */
 class Camera {
 private:
 
@@ -18,6 +21,7 @@ private:
 	static constexpr float DEFAULT_MOVEMENT_SPEED = 5.0f;
 	static constexpr float DEFAULT_MOUSE_SENSITIVITY = 0.1f;
 	static constexpr float DEFAULT_FOV = 45.0f;
+	glm::vec3 initialPosition;
 	glm::vec3 position;
 	glm::vec3 front;
 	glm::vec3 right;
@@ -82,19 +86,14 @@ public:
 	glm::mat4 getViewMatrix() const;
 
 	/**
-	 * Retrives the camera's field of view (zoom)
+	 * Resets the camera to it's initial states
+	 */
+	void reset();
+
+	/**
+	 * Retrieves the camera's field of view (zoom)
 	 */
 	float getFOV() const;
-
-	/**
-	 * Resets the camera's pitch to default
-	 */
-	void resetPitch();
-
-	/**
-	 * Resets the camera's yaw to default
-	 */
-	void resetYaw();
 };
 
 enum class Camera::Movement {
@@ -109,7 +108,8 @@ Camera::Camera(
 	glm::vec3 worldUp,
 	float pitch,
 	float yaw
-) : position(position),
+) : initialPosition(position),
+	position(position),
 	front(glm::vec3(0.0f, 0.0f, -1.0f)),
 	worldUp(worldUp),
 	pitch(pitch),
@@ -125,7 +125,8 @@ Camera::Camera(
 	float worldUpX, float worldUpY, float worldUpZ,
 	float pitch,
 	float yaw
-) : position(glm::vec3(posX, posY, posZ)),
+) : initialPosition(position),
+	position(glm::vec3(posX, posY, posZ)),
 	front(glm::vec3(0.0f, 0.0f, -1.0f)),
 	worldUp(glm::vec3(worldUpX, worldUpY, worldUpZ)),
 	pitch(pitch),
@@ -184,13 +185,11 @@ float Camera::getFOV() const {
 	return fieldOfView;
 }
 
-void Camera::resetPitch() {
+void Camera::reset() {
+	position = initialPosition;
 	pitch = DEFAULT_PITCH;
-	updateCameraVectors();
-}
-
-void Camera::resetYaw() {
 	yaw = DEFAULT_YAW;
+	fieldOfView = DEFAULT_FOV;
 	updateCameraVectors();
 }
 
