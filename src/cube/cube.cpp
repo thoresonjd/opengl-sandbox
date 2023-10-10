@@ -21,6 +21,7 @@
 // Custom
 #include <opengl-sandbox/shader.h>
 #include <opengl-sandbox/camera.h>
+#include <opengl-sandbox/logger.h>
 
 // function prototypes
 // ==================================================
@@ -69,8 +70,8 @@ void mouseScrollCallback(GLFWwindow* window, double offsetX, double offsetY);
 const int OPENGL_VERSION_MAJOR = 3;
 const int OPENGL_VERSION_MINOR = 3;
 const char* WINDOW_NAME = "Cube";
-int windowWidth = 800;
-int windowHeight = 600;
+GLsizei windowWidth = 800;
+GLsizei windowHeight = 600;
 float aspectRatio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 // timing
 float deltaTime = 0.0f;
@@ -80,6 +81,8 @@ Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 bool firstMouse = true;
 float lastX = windowWidth / 2.0f;
 float lastY = windowHeight / 2.0f;
+// logger
+Logger logger(Logger::Output::CONSOLE, "log/cube");
 
 // function definitions
 // ==================================================
@@ -115,7 +118,7 @@ int main(void) {
 	glFrontFace(GL_CCW);
 
 	// create shader program objects
-	Shader cubeShader("src/cube/cube.vs", "src/cube/cube.fs");
+	Shader cubeShader("src/cube/cube.vs", "src/cube/cube.fs", &logger);
 
 	// cube attributes
 	glm::vec3 vertices[] = {
@@ -136,9 +139,9 @@ int main(void) {
 		{ 0.0f, 0.0f, 1.0f, 1.0f }, // blue
 		{ 1.0f, 1.0f, 1.0f, 1.0f }, // white
 		{ 1.0f, 1.0f, 0.0f, 1.0f }, // yellow
-		{ 0.0f, 1.0f, 1.0f, 1.0f,}, // cyan
-		{ 1.0f, 0.0f, 1.0f, 1.0f,}, // magenta
-		{ 0.0f, 0.0f, 0.0f, 1.0f,}  // black
+		{ 0.0f, 1.0f, 1.0f, 1.0f }, // cyan
+		{ 1.0f, 0.0f, 1.0f, 1.0f }, // magenta
+		{ 0.0f, 0.0f, 0.0f, 1.0f }  // black
 	};
 	glm::uvec3 indices[] = {
 		// front
@@ -196,19 +199,19 @@ int main(void) {
 		glm::mat4 model(1.0f);
 		glm::mat4 view = camera.getViewMatrix();
 		// compute proper aspect ratio for multiple viewports
-		float halfWindowWidth = windowWidth / 2;
-		aspectRatio = halfWindowWidth / windowHeight;
+		GLsizei halfWindowWidth = windowWidth / 2;
+		aspectRatio = static_cast<float>(halfWindowWidth) / static_cast<float>(windowHeight);
 		glm::mat4 projection = glm::perspective(camera.getFOV(), aspectRatio, 0.1f, 100.0f);
 		cubeShader.setMat4("model", model);
 		cubeShader.setMat4("view", view);
 		cubeShader.setMat4("projection", projection);
 		// as normal
-		glViewport(0, 0, windowWidth / 2, windowHeight);
+		glViewport(0, 0, halfWindowWidth, windowHeight);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnable(GL_CULL_FACE);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		// as wireframe
-		glViewport(windowWidth / 2, 0, windowWidth / 2, windowHeight);
+		glViewport(halfWindowWidth, 0, halfWindowWidth, windowHeight);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDisable(GL_CULL_FACE); 
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
@@ -227,7 +230,7 @@ int main(void) {
 }
 
 void terminate(int code, std::string message) {
-	std::cout << message << std::endl;
+	logger.log(message);
 	glfwTerminate();
 	exit(code);
 }
@@ -250,6 +253,8 @@ void processKeyboardInput(GLFWwindow* window) {
 		camera.processKeyboard(Camera::Movement::BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		camera.processKeyboard(Camera::Movement::RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		camera.reset();
 }
 
 void mouseMovementCallback(GLFWwindow* window, double posX, double posY) {
