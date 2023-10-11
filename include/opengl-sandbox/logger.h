@@ -48,6 +48,23 @@ private:
 	 */
 	std::string trimString(const std::string& text) const;
 
+	/**
+	 * Determines if console output is required by an output type
+	 */
+	bool requiresConsole(const Output& type) const;
+
+	/**
+	 * Determines if file output is required by an output type
+	 */
+	bool requiresFile(const Output& type) const;
+
+	/**
+	 * Converts an output type to a string
+	 * @param tyoe - An output type
+	 * @return The string representation of the output type
+	 */
+	std::string outputTypeToString(const Output& type) const;
+
 public:
 
 	/**
@@ -69,6 +86,8 @@ public:
 	void log(const std::string& message) const;
 };
 
+#endif
+
 enum class Logger::Output {
 	CONSOLE,
 	FILE,
@@ -77,54 +96,31 @@ enum class Logger::Output {
 
 Logger::Logger(const Output& type, const std::string& baseFilePath)
 	: type(type), baseFilePath(baseFilePath) {
-	switch (type) {
-		case Output::CONSOLE:
-			outs[0] = &std::cout;
-			break;
-		case Output::FILE: {
-			std::string dateTime = timestampToString(getTimestamp());
-			outs[0] = new std::ofstream(baseFilePath + dateTime);
-			break;
-		}
-		case Output::CONSOLE_AND_FILE: {
-			std::string dateTime = timestampToString(getTimestamp());
-			outs[0] = &std::cout;
-			outs[1] = new std::ofstream(baseFilePath + dateTime);
-			break;
-		}
+	if (requiresConsole(type))
+		outs[0] = &std::cout;
+	if (requiresFile(type)) {
+		std::string timestamp = timestampToString(getTimestamp());
+		std::string fileName = baseFilePath + timestamp;
+		outs[1] = new std::ofstream(fileName);
 	}
+	log("Logging to " + outputTypeToString(type));
 }
 
 Logger::~Logger() {
-	switch (type) {
-		case Output::CONSOLE:
-			outs[0] = nullptr;
-			break;
-		case Output::FILE:
-			delete outs[0];
-			outs[0] = nullptr;
-			break;
-		case Output::CONSOLE_AND_FILE:
-			outs[0] = nullptr;
-			delete outs[1];
-			outs[1] = nullptr;
-			break;
-	}
+	if (outs[1]) 
+		delete outs[1];
+	outs[0] = nullptr;
+	outs[1] = nullptr;
 }
 
 void Logger::log(const std::string& message) const {
-	std::tm timestamp = getTimestamp();
-	std::string entry = "[" + timestampToString(timestamp) + "] " + trimString(message);
-	switch (type) {
-		case Logger::Output::CONSOLE:
-		case Logger::Output::FILE:
-			*outs[0] << entry << std::endl;
-			break;
-		case Logger::Output::CONSOLE_AND_FILE:
-			*outs[0] << entry << std::endl;
-			*outs[1] << entry << std::endl;
-			break;
-	}
+	std::string timestamp = timestampToString(getTimestamp());
+	std::string trimmedMessage = trimString(message);
+	std::string entry = "[" + timestamp + "] " + trimmedMessage;
+	if (outs[0])
+		*outs[0] << entry << std::endl;
+	if (outs[1])
+		*outs[1] << entry << std::endl;
 }
 
 std::tm Logger::getTimestamp() const {
@@ -155,4 +151,18 @@ std::string Logger::trimString(const std::string& text) const {
 	return text.substr(0, end + 1);
 }
 
-#endif
+bool Logger::requiresConsole(const Output& type) const {
+	return type == Output::CONSOLE || type == Output::CONSOLE_AND_FILE;
+}
+
+bool Logger::requiresFile(const Output& type) const {
+	return type == Output::FILE || type == Output::CONSOLE_AND_FILE;
+}
+
+std::string Logger::outputTypeToString(const Output& type) const {
+	if (type == Output::CONSOLE)
+		return "console";
+	if (type == Output::FILE)
+		return "file";
+	return "console and file";
+}
