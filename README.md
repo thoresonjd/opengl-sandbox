@@ -14,8 +14,12 @@ Environment for creation, education, and experimentation with OpenGL.
 		<td>Rendering a triangle</td>
 	</tr>
 	<tr>
-		<td><a href="./src/cube">Cube</a></td>
-		<td>Rendering a cube</td>
+		<td><a href="./src/cube_ebo">Cube EBO</a></td>
+		<td>Rendering a cube via an element buffer object</td>
+	</tr>
+	<tr>
+		<td><a href="./src/cube_lighting">Cube lighting</a></td>
+		<td>Implementing a cube class to render a cube shaded with the Blinn-Phong formula</td>
 	</tr>
 </table>
 
