@@ -1,11 +1,11 @@
 /**
- * @file cube.cpp
- * @brief Rendering a cube
+ * @file cube_ebo.cpp
+ * @brief Rendering a cube via an element buffer object
  * @date October 2023
  */
 
- // preprocessor directives
- // ==================================================
+// preprocessor directives
+// ==================================================
 
 // OpenGL
 #include <glad/glad.h>
@@ -82,7 +82,10 @@ bool firstMouse = true;
 float lastX = windowWidth / 2.0f;
 float lastY = windowHeight / 2.0f;
 // logger
-Logger logger(Logger::Output::CONSOLE, "log/cube");
+Logger logger(Logger::Output::CONSOLE);
+// shader
+const char* CUBE_VERT_SHADER = "src/cube_ebo/cube.vs";
+const char* CUBE_FRAG_SHADER = "src/cube_ebo/cube.fs";
 
 // function definitions
 // ==================================================
@@ -118,7 +121,7 @@ int main(void) {
 	glFrontFace(GL_CCW);
 
 	// create shader program objects
-	Shader cubeShader("src/cube/cube.vs", "src/cube/cube.fs", &logger);
+	Shader cubeShader(CUBE_VERT_SHADER, CUBE_FRAG_SHADER, &logger);
 
 	// cube attributes
 	glm::vec3 vertices[] = {
@@ -185,12 +188,18 @@ int main(void) {
 
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
+		// per-frame time logic
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
+		// keboard input
 		processKeyboardInput(window);
+		
+		// set background color
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+
+		// clear buffer bits to prevent information overlap between frames
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// render cube
@@ -213,10 +222,11 @@ int main(void) {
 		// as wireframe
 		glViewport(halfWindowWidth, 0, halfWindowWidth, windowHeight);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDisable(GL_CULL_FACE); 
+		glDisable(GL_CULL_FACE);
 		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
+		// swap buffers and poll events
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
@@ -225,12 +235,14 @@ int main(void) {
 	glDeleteVertexArrays(1, &cubeVAO);
 	glDeleteBuffers(1, &cubeVBO);
 	glDeleteBuffers(1, &cubeEBO);
+	logger.log("Program exited with status " + std::to_string(EXIT_SUCCESS));
 	glfwTerminate();
 	return EXIT_SUCCESS;
 }
 
 void terminate(int code, std::string message) {
 	logger.log(message);
+	logger.log("Program exited with status " + std::to_string(code));
 	glfwTerminate();
 	exit(code);
 }
@@ -273,5 +285,5 @@ void mouseMovementCallback(GLFWwindow* window, double posX, double posY) {
 }
 
 void mouseScrollCallback(GLFWwindow* window, double offsetX, double offsetY) {
-	camera.processMouseScroll(static_cast<float>(offsetY/10.0));
+	camera.processMouseScroll(static_cast<float>(offsetY / 10.0));
 }
