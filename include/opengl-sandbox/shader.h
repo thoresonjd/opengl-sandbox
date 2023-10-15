@@ -159,6 +159,8 @@ public:
 	void setMat4(const std::string& name, const glm::mat4& mat) const;
 };
 
+#endif
+
 Shader::Shader(const char* vertexPath, const char* fragmentPath, Logger* logger) 
 	: logger(logger) {
 	std::string vShaderCode, fShaderCode;
@@ -284,5 +286,3 @@ std::string Shader::shaderTypeToString(GLenum shaderType) const {
 			return "UNRECOGNIZED_SHADER_TYPE";
 	}
 }
-
-#endif
