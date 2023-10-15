@@ -39,6 +39,9 @@ private:
 	void updateCameraVectors();
 public:
 
+	/**
+	 * Represents directions that the camera may move
+	 */
 	enum class Movement;
 	
 	Camera(
@@ -94,7 +97,14 @@ public:
 	 * Retrieves the camera's field of view (zoom)
 	 */
 	float getFOV() const;
+
+	/**
+	 *
+	 */
+	glm::vec3 getPosition() const;
 };
+
+#endif
 
 enum class Camera::Movement {
 	FORWARD,
@@ -161,10 +171,10 @@ void Camera::processMouseMovement(float offsetX, float offsetY, bool constrainPi
 	yaw += offsetX;
 	pitch += offsetY;
 	if (constrainPitch) {
-		if (pitch > 90.0f)
-			pitch = 90.0f;
-		else if (pitch < -90.0f)
-			pitch = -90.0f;
+		if (pitch > 89.9f)
+			pitch = 89.9f;
+		else if (pitch < -89.9f)
+			pitch = -89.9f;
 	}
 	updateCameraVectors();
 }
@@ -193,6 +203,10 @@ void Camera::reset() {
 	updateCameraVectors();
 }
 
+glm::vec3 Camera::getPosition() const {
+	return position;
+}
+
 void Camera::updateCameraVectors() {
 	glm::vec3 reverseDirection;
 	reverseDirection.x = cos(glm::radians(pitch)) * cos(glm::radians(yaw));
@@ -202,5 +216,3 @@ void Camera::updateCameraVectors() {
 	right = glm::normalize(glm::cross(front, worldUp));
 	up = glm::normalize(glm::cross(right, front));
 }
-
-#endif
