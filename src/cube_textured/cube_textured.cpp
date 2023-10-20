@@ -90,7 +90,7 @@ float lastY = windowHeight / 2.0f;
 // logger
 Logger logger(Logger::Output::CONSOLE);
 // texture
-const char* TEX = "assets/tuxwalkinginrain.jpg";
+const char* TEX = "assets/textures/tuxwalkinginrain.jpg";
 // shader
 const char* CUBE_VERT_SHADER = "src/cube_textured/cube.vs";
 const char* CUBE_FRAG_SHADER = "src/cube_textured/cube.fs";
