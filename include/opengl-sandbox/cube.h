@@ -23,9 +23,8 @@ class Cube {
 private:
 	static std::vector<glm::vec3> vertices;
 	static std::vector<glm::vec3> normals;
+	static std::vector<glm::vec2> textureCoordinates;
 	static std::vector<glm::vec4> colors;
-	// TODO: implement texture coordinates
-	//static std::vector<glm::vec2> texture coordinates;
 	static std::vector<glm::uvec3> indices;
 	GLuint vbo, vao, ebo;
 
@@ -162,6 +161,39 @@ std::vector<glm::vec3> Cube::normals = {
 	{0.0f, -1.0f, 0.0f}
 };
 
+std::vector<glm::vec2> Cube::textureCoordinates = {
+	// front
+	{0, 0},
+	{1, 0},
+	{1, 1},
+	{0, 1},
+	// back
+	{0, 0},
+	{1, 0},
+	{1, 1},
+	{0, 1},
+	// left
+	{0, 0},
+	{1, 0},
+	{1, 1},
+	{0, 1},
+	// right
+	{0, 0},
+	{1, 0},
+	{1, 1},
+	{0, 1},
+	// top
+	{0, 0},
+	{1, 0},
+	{1, 1},
+	{0, 1},
+	// bottom
+	{0, 0},
+	{1, 0},
+	{1, 1},
+	{0, 1}
+};
+
 std::vector<glm::vec4> Cube::colors = {
 	// front
 	{ 0.0f, 0.0f, 0.0f, 1.0f }, // black
@@ -242,18 +274,22 @@ void Cube::generateBuffers() {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	std::size_t verticesSize = vertices.size() * sizeof(glm::vec3);
 	std::size_t normalsSize = normals.size() * sizeof(glm::vec3);
+	std::size_t texCoordsSize = textureCoordinates.size() * sizeof(glm::vec2);
 	std::size_t colorsSize = colors.size() * sizeof(glm::vec4);
 	std::size_t indicesSize = indices.size() * sizeof(glm::uvec3);
-	glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize + colorsSize, nullptr, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, verticesSize + normalsSize + texCoordsSize + colorsSize, nullptr, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, verticesSize, &vertices.front());
 	glBufferSubData(GL_ARRAY_BUFFER, verticesSize, normalsSize, &normals.front());
-	glBufferSubData(GL_ARRAY_BUFFER, verticesSize + normalsSize, colorsSize, &colors.front());
+	glBufferSubData(GL_ARRAY_BUFFER, verticesSize + normalsSize, texCoordsSize, &textureCoordinates.front());
+	glBufferSubData(GL_ARRAY_BUFFER, verticesSize + normalsSize + texCoordsSize, colorsSize, &colors.front());
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), reinterpret_cast<void*>(0));
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), reinterpret_cast<void*>(verticesSize));
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), reinterpret_cast<void*>(verticesSize + normalsSize));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), reinterpret_cast<void*>(verticesSize + normalsSize));
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, sizeof(glm::vec4), reinterpret_cast<void*>(verticesSize + normalsSize + texCoordsSize));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
 	glEnableVertexAttribArray(2);
+	glEnableVertexAttribArray(3);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesSize, &indices.front(), GL_STATIC_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
