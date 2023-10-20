@@ -102,9 +102,13 @@ This file outlines the steps necessary for the creation of this project reposito
 - Download GLM from https://glm.g-truc.net/
 - Add the root directory, `/glm`, to `/include`
 
+## stb_image.h
+
+- Download `stb_image.h` from https://github.com/nothings/stb/blob/master/stb_image.h
+- Add `stb_image.h` to `/include`
+
 <!--
 TODO:
-- stb_image.h
 - Assimp
 - Dear ImGui
 -->
