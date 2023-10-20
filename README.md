@@ -18,8 +18,12 @@ Environment for creation, education, and experimentation with OpenGL.
 		<td>Rendering a cube via an element buffer object</td>
 	</tr>
 	<tr>
-		<td><a href="./src/cube_lighting">Cube lighting</a></td>
-		<td>Implementing a cube class to render a cube shaded with the Blinn-Phong formula</td>
+		<td><a href="./src/cube_shaded">Cube shaded</a></td>
+		<td>Rendering a cube shaded via the Blinn-Phong shading model</td>
+	</tr>
+	<tr>
+		<td><a href="./src/cube_textured">Cube textured</a></td>
+		<td>Rendering a texture onto the surface of a cube shaded via the Blinn-Phong shading model</td>
 	</tr>
 </table>
 
