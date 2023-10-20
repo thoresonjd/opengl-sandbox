@@ -45,6 +45,19 @@ void terminate(int exitCode, std::string message);
  */
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
+/**
+ * Determines which image format to use given the number of channels
+ * @param numChannels - The number of color components in an image
+ * @return The corresponding OpenGL image format
+ */
+GLenum getImageFormat(int numChannels);
+
+/**
+ * Reads a texture into memory
+ * @param path - The texture's file path
+ * @param flipVertically - Determines whether to flip the texture along the y-axis
+ * @return The ID of the loaded texture
+ */
 GLuint loadTexture(const char* path, bool flipVertically = true);
 
 /**
@@ -84,6 +97,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+bool resetKeyPressed = false;
 bool firstMouse = true;
 float lastX = windowWidth / 2.0f;
 float lastY = windowHeight / 2.0f;
@@ -223,21 +237,24 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	aspectRatio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
 }
 
+GLenum getImageFormat(int numChannels) {
+	switch (numChannels) {
+		case 1: return GL_RED;
+		case 3: return GL_RGB;
+		case 4: return GL_RGBA;
+		default: return GL_NONE;
+	}
+}
+
 GLuint loadTexture(const char* path, bool flipVertically) {
-	GLuint textureID;
-	glGenTextures(1, &textureID);
+	GLuint texture;
+	glGenTextures(1, &texture);
 	int width, height, numChannels;
 	stbi_set_flip_vertically_on_load(flipVertically);
 	stbi_uc* data = stbi_load(path, &width, &height, &numChannels, 0);
-	if (data) {
-		GLenum format;
-		if (numChannels == 1)
-			format = GL_RED;
-		else if (numChannels == 3)
-			format = GL_RGB;
-		else if (numChannels == 4)
-			format = GL_RGBA;
-		glBindTexture(GL_TEXTURE_2D, textureID);
+	GLenum format = getImageFormat(numChannels);
+	if (data && format) {
+		glBindTexture(GL_TEXTURE_2D, texture);
 		glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -247,7 +264,7 @@ GLuint loadTexture(const char* path, bool flipVertically) {
 	} else
 		logger.log("ERROR::TEXTURE::FAILED_TO_LOAD\n" + std::string{path});
 	stbi_image_free(data);
-	return textureID;
+	return texture;
 }
 
 void processKeyboardInput(GLFWwindow* window) {
@@ -256,19 +273,25 @@ void processKeyboardInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_PRESS && !useBlinnPhongShadingKeyPressed) {
 		useBlinnPhongShading = !useBlinnPhongShading;
 		useBlinnPhongShadingKeyPressed = true;
+		logger.log("Blinn-Phong shading " + std::string{useBlinnPhongShading ? "enabled" : "disabled"});
 	}
 	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE)
 		useBlinnPhongShadingKeyPressed = false;
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.processKeyboard(Camera::Movement::FORWARD, deltaTime);
+		camera.move(Camera::Movement::FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.processKeyboard(Camera::Movement::BACKWARD, deltaTime);
+		camera.move(Camera::Movement::BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.processKeyboard(Camera::Movement::LEFT, deltaTime);
+		camera.move(Camera::Movement::LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.processKeyboard(Camera::Movement::RIGHT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		camera.move(Camera::Movement::RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !resetKeyPressed) {
 		camera.reset();
+		resetKeyPressed = true;
+		logger.log("Camera reset to default orientation");
+	}
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_RELEASE)
+		resetKeyPressed = false;
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		lightPos.z -= LIGHT_MOVEMENT_SPEED * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
@@ -295,9 +318,9 @@ void mouseMovementCallback(GLFWwindow* window, double posX, double posY) {
 	float offsetY = lastY - positionY; // reversed since y-coordinates range from top to bottom
 	lastX = positionX;
 	lastY = positionY;
-	camera.processMouseMovement(offsetX, offsetY);
+	camera.look(offsetX, offsetY);
 }
 
 void mouseScrollCallback(GLFWwindow* window, double offsetX, double offsetY) {
-	camera.processMouseScroll(static_cast<float>(offsetY / 10.0));
+	camera.adjustFOV(static_cast<float>(offsetY / 10.0f));
 }

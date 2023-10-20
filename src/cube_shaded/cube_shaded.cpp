@@ -80,6 +80,7 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+bool resetKeyPressed = false;
 bool firstMouse = true;
 float lastX = windowWidth / 2.0f;
 float lastY = windowHeight / 2.0f;
@@ -206,15 +207,22 @@ void processKeyboardInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, true);
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camera.processKeyboard(Camera::Movement::FORWARD, deltaTime);
+		camera.move(Camera::Movement::FORWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camera.processKeyboard(Camera::Movement::BACKWARD, deltaTime);
+		camera.move(Camera::Movement::BACKWARD, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camera.processKeyboard(Camera::Movement::LEFT, deltaTime);
+		camera.move(Camera::Movement::LEFT, deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camera.processKeyboard(Camera::Movement::RIGHT, deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+		camera.move(Camera::Movement::RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camera.move(Camera::Movement::RIGHT, deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS && !resetKeyPressed) {
 		camera.reset();
+		resetKeyPressed = true;
+		logger.log("Camera reset to default orientation");
+	}
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_RELEASE)
+		resetKeyPressed = false;
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
 		lightPos.z -= LIGHT_MOVEMENT_SPEED * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
@@ -241,9 +249,9 @@ void mouseMovementCallback(GLFWwindow* window, double posX, double posY) {
 	float offsetY = lastY - positionY; // reversed since y-coordinates range from top to bottom
 	lastX = positionX;
 	lastY = positionY;
-	camera.processMouseMovement(offsetX, offsetY);
+	camera.look(offsetX, offsetY);
 }
 
 void mouseScrollCallback(GLFWwindow* window, double offsetX, double offsetY) {
-	camera.processMouseScroll(static_cast<float>(offsetY / 10.0));
+	camera.adjustFOV(static_cast<float>(offsetY / 10.0f));
 }
