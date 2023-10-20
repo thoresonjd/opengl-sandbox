@@ -1,5 +1,5 @@
 /**
- * @file cube_lighting.cpp
+ * @file cube_shaded.cpp
  * @brief Rendering a cube with a point light using Blinn-Phong shading
  * @date October 2023
  */
@@ -86,10 +86,10 @@ float lastY = windowHeight / 2.0f;
 // logger
 Logger logger(Logger::Output::CONSOLE);
 // shader
-const char* CUBE_VERT_SHADER = "src/cube_lighting/cube.vs";
-const char* CUBE_FRAG_SHADER = "src/cube_lighting/cube.fs";
-const char* LIGHT_VERT_SHADER = "src/cube_lighting/light.vs";
-const char* LIGHT_FRAG_SHADER = "src/cube_lighting/light.fs";
+const char* CUBE_VERT_SHADER = "src/cube_shaded/cube.vs";
+const char* CUBE_FRAG_SHADER = "src/cube_shaded/cube.fs";
+const char* LIGHT_VERT_SHADER = "src/cube_shaded/light.vs";
+const char* LIGHT_FRAG_SHADER = "src/cube_shaded/light.fs";
 // lighting
 const float LIGHT_SCALAR = 0.25f;
 const float LIGHT_MOVEMENT_SPEED = 4.0f;
