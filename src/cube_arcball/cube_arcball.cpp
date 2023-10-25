@@ -188,7 +188,6 @@ int main(void) {
 		// coordinate space transformations
 		const float FRUSTUM_NEAR = 0.01f;
 		const float FRUSTUM_FAR = 100.0f;
-		glm::mat4 arcballRot = arcball.getRotation();
 		glm::mat4 model;
 		glm::mat4 view = camera.getViewMatrix();
 		glm::mat4 projection = glm::perspective(camera.getFOV(), aspectRatio, FRUSTUM_NEAR, FRUSTUM_FAR);
@@ -198,7 +197,6 @@ int main(void) {
 			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			model = glm::mat4(1.0f);
-			model = arcballRot * model;
 			model = glm::translate(model, lightPos);
 			model = glm::scale(model, glm::vec3(LIGHT_SCALAR));
 			lightShader.use();
@@ -213,9 +211,9 @@ int main(void) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		model = glm::mat4(1.0f);
-		model = arcballRot * model;
+		model = arcball.getRotation() * model;
 		cubeShader.use();
-		cubeShader.setVec3("light.position", glm::vec3(arcballRot * glm::vec4(lightPos, 1.0f)));
+		cubeShader.setVec3("light.position", lightPos);
 		cubeShader.setVec3("light.ambient", lightColor);
 		cubeShader.setVec3("light.diffuse", lightColor);
 		cubeShader.setVec3("light.specular", lightColor);
@@ -292,13 +290,13 @@ void processKeyboardInput(GLFWwindow* window) {
 	}
 	if (glfwGetKey(window, GLFW_KEY_B) == GLFW_RELEASE)
 		useBlinnPhongShadingKeyPressed = false;
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		lightPos.z -= LIGHT_MOVEMENT_SPEED * deltaTime;
-	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		lightPos.z += LIGHT_MOVEMENT_SPEED * deltaTime;
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		lightPos.x -= LIGHT_MOVEMENT_SPEED * deltaTime;
-	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		lightPos.x += LIGHT_MOVEMENT_SPEED * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
 		lightPos.y += LIGHT_MOVEMENT_SPEED * deltaTime;
@@ -322,9 +320,9 @@ void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		double posX, posY;
 		glfwGetCursorPos(window, &posX, &posY);
-		glm::vec2 pos = arcball.screenToNDC(static_cast<float>(posX), static_cast<float>(posY), windowWidth, windowHeight);
-		arcball.down(pos);
+		glm::vec2 pos = arcball.screenToNDC(posX, posY, windowWidth, windowHeight);
+		arcball.beginRotation(pos);
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-		arcball.up();
+		arcball.endRotation();
 }
