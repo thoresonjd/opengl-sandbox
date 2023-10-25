@@ -18,9 +18,6 @@
 #include <stb_image.h>
 // C++
 #include <string>
-#include <iostream>
-#include <cmath>
-#include <vector>
 // Custom
 #include <opengl-sandbox/shader.h>
 #include <opengl-sandbox/camera.h>
@@ -211,7 +208,8 @@ int main(void) {
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, texture);
 		model = glm::mat4(1.0f);
-		model = arcball.getRotation() * model;
+		glm::mat4 rotation = arcball.getRotationMatrix();
+		model = rotation * model;
 		cubeShader.use();
 		cubeShader.setVec3("light.position", lightPos);
 		cubeShader.setVec3("light.ambient", lightColor);

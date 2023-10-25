@@ -16,9 +16,6 @@
 #include <glm/gtc/type_ptr.hpp>
 // C++
 #include <string>
-#include <iostream>
-#include <cmath>
-#include <vector>
 // Custom
 #include <opengl-sandbox/shader.h>
 #include <opengl-sandbox/camera.h>

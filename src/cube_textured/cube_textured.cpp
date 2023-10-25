@@ -18,9 +18,6 @@
 #include <stb_image.h>
 // C++
 #include <string>
-#include <iostream>
-#include <cmath>
-#include <vector>
 // Custom
 #include <opengl-sandbox/shader.h>
 #include <opengl-sandbox/camera.h>
