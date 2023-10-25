@@ -36,7 +36,7 @@ vec3 calculateBlinnPhongShading() {
 	vec3 diffuse = diff * light.diffuse;
 	
 	// specular
-	float specularStrength = 0.5;
+	float specularStrength = 1.0;
 	int shininess = 32;
 	float spec = pow(max(dot(viewDir, halfwayDir), 0.0), shininess);
 	vec3 specular = specularStrength * spec * light.specular;
