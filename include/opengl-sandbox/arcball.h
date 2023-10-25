@@ -61,13 +61,13 @@ public:
 	 * @param posX - The x-coordinate of a cursor position
 	 * @param posY - The y-coordinate of a cursor rotation
 	 */
-	void down(float posX, float posY);
+	void beginRotation(float posX, float posY);
 
 	/**
 	 * Starts the quarternion rotation by setting the starting position
 	 * @param pos - A two-dimensional cursor position
 	 */
-	void down(glm::vec2 pos);
+	void beginRotation(glm::vec2 pos);
 
 	/**
 	 * Applies the current position to the ongoing quaternion rotation
@@ -85,7 +85,7 @@ public:
 	/**
 	 * Completes the quaternion arcball rotation
 	 */
-	void up();
+	void endRotation();
 
 	/**
 	 * Returns the quaternion rotation as a four-by-four matrix
@@ -101,6 +101,16 @@ public:
 	 * @return The cursor position in normaized device coordinates
 	 */
 	static glm::vec2 screenToNDC(float posX, float posY, int width, int height);
+
+	/**
+	 * Converts a cursor position from screen coordinates to normalized device coordinates
+	 * @param posX - The x-coordinate of a cursor position
+	 * @param posY - The y-coordinate of a cursor position
+	 * @param width - The width of the screen
+	 * @param height - The height of the screen
+	 * @return The cursor position in normaized device coordinates
+	 */
+	static glm::vec2 screenToNDC(double posX, double posY, int width, int height);
 
 	/**
 	 * Converts a cursor position from screen coordinates to normalized device coordinates
@@ -129,11 +139,11 @@ Arcball::Arcball(
 	invertY(invertY) {
 }
 
-void Arcball::down(float posX, float posY) {
-	down(glm::vec2(posX, posY));
+void Arcball::beginRotation(float posX, float posY) {
+	beginRotation(glm::vec2(posX, posY));
 }
 
-void Arcball::down(glm::vec2 pos) {
+void Arcball::beginRotation(glm::vec2 pos) {
 	if (!invertY)
 		pos.y *= -1.0f;
 	start = pos;
@@ -151,7 +161,7 @@ void Arcball::rotate(glm::vec2 pos) {
 	currentRotation = computeRotationQuaternion(start, end);
 }
 
-void Arcball::up() {
+void Arcball::endRotation() {
 	lastRotation = currentRotation* lastRotation;
 	currentRotation = IDENTITY_QUATERNION;
 	isActive = false;
@@ -163,6 +173,12 @@ glm::mat4 Arcball::getRotation() {
 
 glm::vec2 Arcball::screenToNDC(float posX, float posY, int width, int height) {
 	return screenToNDC(glm::vec2(posX, posY), width, height);
+}
+
+glm::vec2 Arcball::screenToNDC(double posX, double posY, int width, int height) {
+	float posXf = static_cast<float>(posX);
+	float posYf = static_cast<float>(posY);
+	return screenToNDC(glm::vec2(posXf, posYf), width, height);
 }
 
 glm::vec2 Arcball::screenToNDC(glm::vec2 pos, int width, int height) {
@@ -177,12 +193,12 @@ bool Arcball::getActiveStatus() const {
 
 glm::quat Arcball::computeRotationQuaternion(glm::vec2 start, glm::vec2 end) {
 	glm::vec3 startPos = mapToSurface(start);
-	glm::vec3 currentPos = mapToSurface(end);
-	float startDotCurrent = glm::dot(startPos, currentPos);
+	glm::vec3 endPos = mapToSurface(end);
+	float startDotCurrent = glm::dot(startPos, endPos);
 	float startMagnitude = glm::length(startPos);
-	float currentMagnitude = glm::length(currentPos);
-	float angle = acos(std::min(startDotCurrent / (startMagnitude * currentMagnitude), 1.0f));
-	glm::vec3 axis = glm::normalize(glm::cross(startPos, currentPos));
+	float endMagnitude = glm::length(endPos);
+	float angle = acos(std::min(startDotCurrent / (startMagnitude * endMagnitude), 1.0f));
+	glm::vec3 axis = glm::normalize(glm::cross(startPos, endPos));
 	return glm::normalize(glm::angleAxis(angle, axis));
 }
 
