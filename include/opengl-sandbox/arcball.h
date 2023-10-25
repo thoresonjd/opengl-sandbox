@@ -14,17 +14,18 @@
 #include <cmath>
 
 /**
- * @class Arcball - Represents an arcball and corresponding quaternion rotations
+ * @class Arcball - Represents an arcball and corresponding quaternion rotations.
+ * Uses the entire screen as the frame of reference via NDC.
  */
 class Arcball {
 private:
-	static constexpr glm::quat IDENTITY_QUATERNION = glm::quat(1.0f, glm::vec3(0.0f));
 	static constexpr float DEFAULT_RADIUS = 1.0f;
-	glm::quat lastRotation;
-	glm::quat currentRotation;
+	static constexpr glm::quat IDENTITY_QUATERNION = glm::quat(1.0f, glm::vec3(0.0f));
+	float radius;
 	glm::vec2 start;
 	glm::vec2 end;
-	float radius;
+	glm::quat lastRotation;
+	glm::quat currentRotation;
 	bool invertY;
 	bool isActive = false;
 
@@ -34,7 +35,7 @@ private:
 	 * @param end - The ending position of a quaternion rotation
 	 * @return A quaternion representing a rotation
 	 */
-	glm::quat computeRotationQuaternion(glm::vec2 start, glm::vec2 end);
+	glm::quat computeRotationQuaternion(glm::vec2 start, glm::vec2 end) const;
 
 	/**
 	 * Maps a cursor position to the surface of the arcball by computing the z-coordinate
@@ -90,7 +91,7 @@ public:
 	/**
 	 * Returns the quaternion rotation as a four-by-four matrix
 	 */
-	glm::mat4 getRotation();
+	glm::mat4 getRotationMatrix();
 
 	/**
 	 * Converts a cursor position from screen coordinates to normalized device coordinates
@@ -130,7 +131,8 @@ public:
 #endif
 
 Arcball::Arcball(
-	float radius, bool invertY
+	float radius,
+	bool invertY
 ) : lastRotation(IDENTITY_QUATERNION), 
 	currentRotation(IDENTITY_QUATERNION),
 	start(glm::vec2(0.0f)),
@@ -162,12 +164,12 @@ void Arcball::rotate(glm::vec2 pos) {
 }
 
 void Arcball::endRotation() {
-	lastRotation = currentRotation* lastRotation;
+	lastRotation = currentRotation * lastRotation;
 	currentRotation = IDENTITY_QUATERNION;
 	isActive = false;
 }
 
-glm::mat4 Arcball::getRotation() {
+glm::mat4 Arcball::getRotationMatrix() {
 	return glm::mat4_cast(currentRotation* lastRotation);
 };
 
@@ -191,7 +193,7 @@ bool Arcball::getActiveStatus() const {
 	return isActive;
 }
 
-glm::quat Arcball::computeRotationQuaternion(glm::vec2 start, glm::vec2 end) {
+glm::quat Arcball::computeRotationQuaternion(glm::vec2 start, glm::vec2 end) const {
 	glm::vec3 startPos = mapToSurface(start);
 	glm::vec3 endPos = mapToSurface(end);
 	float startDotCurrent = glm::dot(startPos, endPos);
