@@ -4,8 +4,8 @@
  * @date October 2023
  */
 
- // preprocessor directives
- // ==================================================
+// preprocessor directives
+// ==================================================
 
 // OpenGL
 #include <glad/glad.h>
