@@ -32,38 +32,38 @@ private:
 	/**
 	 * Retrieves the current time
 	 */
-	std::tm getTimestamp() const;
+	static std::tm getTimestamp();
 	
 	/**
 	 * Converts a timestamp to a string
 	 * @param timestamp - A reference to a timestamp
 	 * @return The string representation of the timestamp
 	 */
-	std::string timestampToString(const std::tm& timestamp) const;
+	static std::string timestampToString(const std::tm& timestamp);
 
 	/**
 	 * Removes trailing whitespace from the end of a string
 	 * @param text - The string to trim
 	 * @return A substring without trailing whitespace
 	 */
-	std::string trimString(const std::string& text) const;
+	static std::string trimString(const std::string& text);
 
 	/**
 	 * Determines if console output is required by an output type
 	 */
-	bool requiresConsole(const Output& type) const;
+	static bool requiresConsole(const Output& type);
 
 	/**
 	 * Determines if file output is required by an output type
 	 */
-	bool requiresFile(const Output& type) const;
+	static bool requiresFile(const Output& type);
 
 	/**
 	 * Converts an output type to a string
 	 * @param tyoe - An output type
 	 * @return The string representation of the output type
 	 */
-	std::string outputTypeToString(const Output& type) const;
+	static std::string outputTypeToString(const Output& type);
 
 public:
 
@@ -123,14 +123,14 @@ void Logger::log(const std::string& message) const {
 		*outs[1] << entry << std::endl;
 }
 
-std::tm Logger::getTimestamp() const {
+std::tm Logger::getTimestamp() {
 	std::time_t now = std::time(0);
 	std::tm timestamp;
 	localtime_s(&timestamp, &now);
 	return timestamp;
 }
 
-std::string Logger::timestampToString(const std::tm& timestamp) const {
+std::string Logger::timestampToString(const std::tm& timestamp) {
 	std::string year = std::to_string(timestamp.tm_year + 1900);
 	std::string month = std::to_string(timestamp.tm_mon + 1);
 	std::string day = std::to_string(timestamp.tm_mday);
@@ -145,21 +145,21 @@ std::string Logger::timestampToString(const std::tm& timestamp) const {
 	return year + month + day + "-" + hour + minute + second;
 }
 
-std::string Logger::trimString(const std::string& text) const {
+std::string Logger::trimString(const std::string& text) {
 	std::size_t end = text.length();
 	while (std::isspace(text[--end]));
 	return text.substr(0, end + 1);
 }
 
-bool Logger::requiresConsole(const Output& type) const {
+bool Logger::requiresConsole(const Output& type) {
 	return type == Output::CONSOLE || type == Output::CONSOLE_AND_FILE;
 }
 
-bool Logger::requiresFile(const Output& type) const {
+bool Logger::requiresFile(const Output& type) {
 	return type == Output::FILE || type == Output::CONSOLE_AND_FILE;
 }
 
-std::string Logger::outputTypeToString(const Output& type) const {
+std::string Logger::outputTypeToString(const Output& type) {
 	if (type == Output::CONSOLE)
 		return "console";
 	if (type == Output::FILE)
