@@ -14,7 +14,7 @@ CameraArcball::CameraArcball(
 	position(position),
 	target(target),
 	worldUp(worldUp),
-	fieldOfView(DEFAULT_FOV) {
+	fieldOfView(MAX_FOV) {
 	updateCameraVectors();
 }
 
@@ -26,7 +26,7 @@ CameraArcball::CameraArcball(
 	position(glm::vec3(posX, posY, posZ)),
 	target(glm::vec3(targetX, targetY, targetZ)),
 	worldUp(glm::vec3(worldUpX, worldUpY, worldUpZ)),
-	fieldOfView(DEFAULT_FOV) {
+	fieldOfView(MAX_FOV) {
 	updateCameraVectors();
 }
 
@@ -55,7 +55,8 @@ void CameraArcball::adjustFOV(float offset) {
 		fieldOfView = MAX_FOV;
 }
 
-glm::mat4 CameraArcball::getViewMatrix()  {
+glm::mat4 CameraArcball::getViewMatrix() {
+	// apply rotation before view transform to achieve desired orbital effect
 	return glm::lookAt(position, front, up) * getRotationMatrix();
 }
 
@@ -63,8 +64,9 @@ float CameraArcball::getFOV() const {
 	return fieldOfView;
 }
 
-glm::vec3 CameraArcball::getPosition() const {
-	return position;
+glm::vec3 CameraArcball::getPosition() {
+	// apply rotatation transpose to position to ensure proper coordinates upon return
+	return glm::vec3(glm::transpose(getRotationMatrix()) * glm::vec4(position, 1.0f));;
 }
 
 void CameraArcball::updateCameraVectors() {
