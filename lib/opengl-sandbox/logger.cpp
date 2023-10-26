@@ -15,7 +15,6 @@ Logger::Logger(const Output& type, const std::string& baseFilePath)
 		std::string fileName = baseFilePath + timestamp;
 		outs[1] = new std::ofstream(fileName);
 	}
-	log("Logging to " + outputTypeToString(type));
 }
 
 Logger::~Logger() {
@@ -25,14 +24,26 @@ Logger::~Logger() {
 	outs[1] = nullptr;
 }
 
-void Logger::log(const std::string& message) const {
-	std::string timestamp = timestampToString(getTimestamp());
+void Logger::log(const unsigned char* message, bool showTimestamp, const char& end) const {
+	log(reinterpret_cast<const char*>(message), showTimestamp, end);
+}
+
+void Logger::log(const char* message, bool showTimestamp, const char& end) const {
+	log(std::string{message}, showTimestamp, end);
+}
+
+void Logger::log(const std::string& message, bool showTimestamp, const char& end) const {
 	std::string trimmedMessage = trimString(message);
-	std::string entry = "[" + timestamp + "] " + trimmedMessage;
+	std::string entry = trimmedMessage;
+	if (showTimestamp) {
+		std::string timestamp = timestampToString(getTimestamp());
+		entry = "[" + timestamp + "] " + entry;
+	}
+	entry += end;
 	if (outs[0])
-		*outs[0] << entry << std::endl;
+		*outs[0] << entry;
 	if (outs[1])
-		*outs[1] << entry << std::endl;
+		*outs[1] << entry;
 }
 
 std::tm Logger::getTimestamp() {
@@ -59,6 +70,8 @@ std::string Logger::timestampToString(const std::tm& timestamp) {
 
 std::string Logger::trimString(const std::string& text) {
 	std::size_t end = text.length();
+	if (!end) 
+		return "";
 	while (std::isspace(text[--end]));
 	return text.substr(0, end + 1);
 }
@@ -69,12 +82,4 @@ bool Logger::requiresConsole(const Output& type) {
 
 bool Logger::requiresFile(const Output& type) {
 	return type == Output::FILE || type == Output::CONSOLE_AND_FILE;
-}
-
-std::string Logger::outputTypeToString(const Output& type) {
-	if (type == Output::CONSOLE)
-		return "console";
-	if (type == Output::FILE)
-		return "file";
-	return "console and file";
 }

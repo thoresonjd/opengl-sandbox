@@ -62,13 +62,6 @@ private:
 	 */
 	static bool requiresFile(const Output& type);
 
-	/**
-	 * Converts an output type to a string
-	 * @param tyoe - An output type
-	 * @return The string representation of the output type
-	 */
-	static std::string outputTypeToString(const Output& type);
-
 public:
 
 	/**
@@ -86,8 +79,26 @@ public:
 	/**
 	 * Logs messages to the output stream(s)
 	 * @param message - The text to log
+	 * @param showTimestamp - Determines if a timestamp should be logged with the message
+	 * @param end - A character to print after the message as a separater between a successive message
 	 */
-	void log(const std::string& message) const;
+	void log(const unsigned char* message, bool showTimestamp = true, const char& end = '\n') const;
+
+	/**
+	 * Logs messages to the output stream(s)
+	 * @param message - The text to log
+	 * @param showTimestamp - Determines if a timestamp should be logged with the message
+	 * @param end - A character to print after the message as a separater between a successive message
+	 */
+	void log(const char* message, bool showTimestamp = true, const char& end = '\n') const;
+
+	/**
+	 * Logs messages to the output stream(s)
+	 * @param message - The text to log
+	 * @param showTimestamp - Determines if a timestamp should be logged with the message
+	 * @param end - A character to print after the message as a separater between a successive message
+	 */
+	void log(const std::string& message, bool showTimestamp = true, const char& end = '\n') const;
 };
 
 #endif
