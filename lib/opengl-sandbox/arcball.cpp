@@ -26,7 +26,7 @@ void Arcball::beginRotation(glm::vec2 pos) {
 	if (!invertY)
 		pos.y *= -1.0f;
 	start = pos;
-	isActive = true;
+	rotating = true;
 }
 
 void Arcball::rotate(float posX, float posY) {
@@ -43,7 +43,11 @@ void Arcball::rotate(glm::vec2 pos) {
 void Arcball::endRotation() {
 	lastRotation = currentRotation * lastRotation;
 	currentRotation = IDENTITY_QUATERNION;
-	isActive = false;
+	rotating = false;
+}
+
+bool Arcball::isRotating() const {
+	return rotating;
 }
 
 glm::mat4 Arcball::getRotationMatrix() {
@@ -64,10 +68,6 @@ glm::vec2 Arcball::screenToNDC(glm::vec2 pos, int width, int height) {
 	float x = ((pos.x / static_cast<float>(width)) - 0.5f) * 2.0f;
 	float y = ((pos.y / static_cast<float>(height)) - 0.5f) * 2.0f;
 	return glm::vec2(x, y);
-}
-
-bool Arcball::getActiveStatus() const {
-	return isActive;
 }
 
 glm::quat Arcball::computeRotationQuaternion(glm::vec2 start, glm::vec2 end) const {

@@ -28,7 +28,7 @@ private:
 	glm::quat lastRotation;
 	glm::quat currentRotation;
 	bool invertY;
-	bool isActive = false;
+	bool rotating = false;
 
 	/**
 	 * Computes a rotation quaternion given a start point and an end point
@@ -76,18 +76,23 @@ public:
 	 * @param posX - The x-coordinate of the current cursor position
 	 * @param posY - The y-coordinate of the current cursor rotation
 	 */
-	virtual void rotate(float posX, float posY);
+	void rotate(float posX, float posY);
 
 	/**
 	 * Applies the current position to the ongoing quaternion rotation
 	 * @param pos - The current two-dimensional cursor position
 	 */
-	virtual void rotate(glm::vec2 pos);
+	void rotate(glm::vec2 pos);
 
 	/**
 	 * Completes the quaternion arcball rotation
 	 */
 	void endRotation();
+
+	/**
+	 * Determines if the arcball is actively undergoing a rotation
+	 */
+	bool isRotating() const;
 
 	/**
 	 * Returns the quaternion rotation as a four-by-four matrix
@@ -122,11 +127,6 @@ public:
 	 * @return The cursor position in normaized device coordinates
 	 */
 	static glm::vec2 screenToNDC(glm::vec2 pos, int width, int height);
-	
-	/**
-	 * Determines if the arcball is actively undergoing a rotation
-	 */
-	bool getActiveStatus() const;
 };
 
 #endif
