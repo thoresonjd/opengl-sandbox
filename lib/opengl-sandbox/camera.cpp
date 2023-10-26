@@ -17,8 +17,6 @@ Camera::Camera(
 	worldUp(worldUp),
 	pitch(pitch),
 	yaw(yaw),
-	movementSpeed(DEFAULT_MOVEMENT_SPEED),
-	lookSensitivity(DEFAULT_LOOK_SENSITIVITY),
 	fieldOfView(DEFAULT_FOV) {
 	updateCameraVectors();
 }
@@ -34,14 +32,12 @@ Camera::Camera(
 	worldUp(glm::vec3(worldUpX, worldUpY, worldUpZ)),
 	pitch(pitch),
 	yaw(yaw),
-	movementSpeed(DEFAULT_MOVEMENT_SPEED),
-	lookSensitivity(DEFAULT_LOOK_SENSITIVITY),
 	fieldOfView(DEFAULT_FOV) {
 	updateCameraVectors();
 }
 
 void Camera::move(Movement direction, float deltaTime) {
-	float velocity = movementSpeed * deltaTime;
+	float velocity = MOVEMENT_SPEED * deltaTime;
 	switch (direction) {
 		case Movement::FORWARD:
 			position += front * velocity;
@@ -59,8 +55,8 @@ void Camera::move(Movement direction, float deltaTime) {
 }
 
 void Camera::look(float offsetX, float offsetY, bool constrainPitch) {
-	offsetX *= lookSensitivity;
-	offsetY *= lookSensitivity;
+	offsetX *= LOOK_SENSITIVITY;
+	offsetY *= LOOK_SENSITIVITY;
 	yaw += offsetX;
 	pitch += offsetY;
 	if (constrainPitch) {

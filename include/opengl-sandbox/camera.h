@@ -20,11 +20,11 @@ private:
 	static constexpr float MAX_PITCH = 89.99f;
 	static constexpr float MIN_FOV = 1.0f;
 	static constexpr float MAX_FOV = 45.0f;
+	static constexpr float DEFAULT_FOV = 45.0f;
 	static constexpr float DEFAULT_PITCH = 0.0f;
 	static constexpr float DEFAULT_YAW = -90.0f;
-	static constexpr float DEFAULT_MOVEMENT_SPEED = 5.0f;
-	static constexpr float DEFAULT_LOOK_SENSITIVITY = 0.1f;
-	static constexpr float DEFAULT_FOV = 45.0f;
+	static constexpr float MOVEMENT_SPEED = 5.0f;
+	static constexpr float LOOK_SENSITIVITY = 0.1f;
 	glm::vec3 initialPosition;
 	glm::vec3 position;
 	glm::vec3 front;
@@ -33,8 +33,6 @@ private:
 	glm::vec3 worldUp;
 	float pitch;
 	float yaw;
-	float movementSpeed;
-	float lookSensitivity;
 	float fieldOfView;
 	
 	/**
