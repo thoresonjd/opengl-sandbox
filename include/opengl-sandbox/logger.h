@@ -29,6 +29,7 @@ public:
 	};
 
 private:
+
 	Output type;
 	std::ostream* outs[2] = { nullptr, nullptr };
 	std::string baseFilePath;
@@ -70,6 +71,7 @@ public:
 	 * @param baseFilePath - The base path to log file output
 	 */
 	Logger(const Output& type, const std::string& baseFilePath = "");
+
 	Logger(const Logger& other) = delete;
 	Logger(Logger&& other) = delete;
 	Logger& operator=(const Logger& other) = delete;

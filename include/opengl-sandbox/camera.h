@@ -16,6 +16,7 @@
  */
 class Camera {
 private:
+
 	static constexpr float MIN_PITCH = -89.99f;
 	static constexpr float MAX_PITCH = 89.99f;
 	static constexpr float MIN_FOV = 1.0f;
@@ -39,6 +40,7 @@ private:
 	 * Recomputes camera vectors: front, right, and up
 	 */
 	void updateCameraVectors();
+
 public:
 
 	/**
@@ -82,6 +84,7 @@ public:
 		float pitch,
 		float yaw
 	);
+
 	Camera(const Camera& other) = delete;
 	Camera(Camera&& other) = delete;
 	Camera& operator=(const Camera& other) = delete;
@@ -113,12 +116,12 @@ public:
 	void adjustFOV(float offset);
 	
 	/**
-	 * Computes the view matrix for the camera given it's position, front, and up vectors
+	 * Computes the view matrix for the camera given its position, front, and up vectors
 	 */
 	glm::mat4 getViewMatrix() const;
 
 	/**
-	 * Resets the camera to it's initial states
+	 * Resets the camera to its initial state
 	 */
 	void reset();
 

@@ -57,6 +57,7 @@ public:
 	 * @param logger - A pointer to a logger to log errors
 	 */
 	Shader(const char* vertexPath, const char* fragmentPath, Logger* logger = nullptr);
+
 	Shader(const Shader& other) = delete;
 	Shader(Shader&& other) = delete;
 	Shader& operator=(const Shader& other) = delete;

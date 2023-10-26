@@ -21,6 +21,7 @@
  */
 class Cube {
 private:
+
 	static std::vector<glm::vec3> vertices;
 	static std::vector<glm::vec3> normals;
 	static std::vector<glm::vec2> textureCoordinates;
@@ -41,7 +42,12 @@ private:
 	void deleteBuffers() const;
 
 public:
+	
+	/**
+	 * Default constructor
+	 */
 	Cube();
+
 	Cube(const Cube& other) = delete;
 	Cube(Cube&& other) = delete;
 	Cube& operator=(const Cube& other) = delete;

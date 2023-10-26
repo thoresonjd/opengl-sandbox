@@ -19,7 +19,8 @@
  * Uses the entire screen as the frame of reference via NDC.
  */
 class Arcball {
-private:
+protected:
+
 	static constexpr float DEFAULT_RADIUS = 1.0f;
 	static constexpr glm::quat IDENTITY_QUATERNION = glm::quat(1.0f, glm::vec3(0.0f));
 	float radius;
@@ -52,6 +53,7 @@ public:
 	 * @param invertY - Determines if the y-coordinate should be inverted when performing a rotation
 	 */
 	Arcball(float radius = DEFAULT_RADIUS, bool invertY = false);
+
 	Arcball(const Arcball& other) = delete;
 	Arcball(Arcball&& other) = delete;
 	Arcball& operator=(const Arcball& other) = delete;
