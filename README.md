@@ -14,11 +14,11 @@ Environment for creation, education, and experimentation with OpenGL.
 	</tr>
 	<tr>
 		<td><a href="./include/opengl-sandbox/logger.h">Logger</a></td>
-		<td>Header-only logger class used to log to console and/or file</td>
+		<td>Logger class used to log to console and/or file</td>
 	</tr>
 	<tr>
 		<td><a href="./include/opengl-sandbox/arcball.h">Arcball</a></td>
-		<td>Header-only arcball class that utilizes quaternions to rotate objects</td>
+		<td>Arcball class that utilizes quaternions to rotate objects</td>
 	</tr>
 	<tr>
 		<th colspan=2>Programs</th>
