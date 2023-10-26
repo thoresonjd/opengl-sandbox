@@ -26,11 +26,38 @@
 // ==================================================
 
 /**
+ * Initializes GLFW
+ */
+void initGLFW();
+
+/**
+ * Creates a window object
+ * @return A pointer to the GLFW window
+ */
+GLFWwindow* initWindow();
+
+/**
+ * Sets all window callback
+ * @param window - A pointer to a GLFW window
+ */
+void initCallbacks(GLFWwindow* window);
+
+/**
+ * Initializes GLAD
+ */
+void initGLAD();
+
+/**
  * Stops the program
  * @param code - An exit code
  * @param message - A message detailing program termination
  */
 void terminate(int exitCode, std::string message);
+
+/**
+ * Prints program specifications to the logger
+ */
+void logSpecs();
 
 /**
  * Handles framebuffer resizing for a given window
@@ -39,6 +66,11 @@ void terminate(int exitCode, std::string message);
  * @param height - The new framebuffer height
  */
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+
+/**
+ * Processes per-frame time logic (change in time since previous frame)
+ */
+void processTime();
 
 /**
  * Processes keyboard input
@@ -89,36 +121,26 @@ const char* CUBE_FRAG_SHADER = "src/cube_shaded/cube.fs";
 const char* LIGHT_VERT_SHADER = "src/cube_shaded/light.vs";
 const char* LIGHT_FRAG_SHADER = "src/cube_shaded/light.fs";
 // lighting
-const float LIGHT_SCALAR = 0.25f;
-const float LIGHT_MOVEMENT_SPEED = 4.0f;
-glm::vec3 lightColor(1.0f);
-glm::vec3 lightPos(2.0f);
+struct {
+	float scalar = 0.25f;
+	float movementSpeed = 4.0f;
+	glm::vec3 position = glm::vec3(2.0f);
+	glm::vec3 color = glm::vec3(1.0f);
+	float constant = 1.0f;
+	float linear = 0.09f;
+	float quadratic = 0.032f;
+} light;
 
 // function definitions
 // ==================================================
 
 int main(void) {
-	// initialize GLFW
-	if (!glfwInit())
-		terminate(EXIT_FAILURE, "Failed to initialize GLFW");
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_VERSION_MAJOR);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_VERSION_MINOR);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_SAMPLES, 4);
-
-	// create window
-	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, WINDOW_NAME, nullptr, nullptr);
-	if (!window)
-		terminate(EXIT_FAILURE, "Failed to create GLFW window");
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
-	glfwSetCursorPosCallback(window, mouseMovementCallback);
-	glfwSetScrollCallback(window, mouseScrollCallback);
-	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-	// initialize GLAD
-	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
-		terminate(EXIT_FAILURE, "Failed to initialize GLAD");
+	// initialize
+	initGLFW();
+	GLFWwindow* window = initWindow();
+	initCallbacks(window);
+	initGLAD();
+	logSpecs();
 
 	// configure OpenGL
 	glEnable(GL_MULTISAMPLE);
@@ -136,11 +158,10 @@ int main(void) {
 
 	// render loop
 	while (!glfwWindowShouldClose(window)) {
-		float currentFrame = static_cast<float>(glfwGetTime());
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
+		processTime();
 		processKeyboardInput(window);
+
+		// set color and clear buffer bits
 		glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -152,10 +173,10 @@ int main(void) {
 		glm::mat4 projection = glm::perspective(camera.getFOV(), aspectRatio, FRUSTUM_NEAR, FRUSTUM_FAR);
 
 		// render light source
-		model = glm::translate(model, lightPos);
-		model = glm::scale(model, glm::vec3(LIGHT_SCALAR));
+		model = glm::translate(model, light.position);
+		model = glm::scale(model, glm::vec3(light.scalar));
 		lightShader.use();
-		lightShader.setVec3("lightColor", lightColor);
+		lightShader.setVec3("lightColor", light.color);
 		lightShader.setMat4("model", model);
 		lightShader.setMat4("view", view);
 		lightShader.setMat4("projection", projection);
@@ -164,13 +185,13 @@ int main(void) {
 		// render cube
 		model = glm::mat4(1.0f);
 		cubeShader.use();
-		cubeShader.setVec3("light.position", lightPos);
-		cubeShader.setVec3("light.ambient", lightColor);
-		cubeShader.setVec3("light.diffuse", lightColor);
-		cubeShader.setVec3("light.specular", lightColor);
-		cubeShader.setFloat("light.constant", 1.0f);
-		cubeShader.setFloat("light.linear", 0.09f);
-		cubeShader.setFloat("light.quadratic", 0.032f);
+		cubeShader.setVec3("light.position", light.position);
+		cubeShader.setVec3("light.ambient", light.color);
+		cubeShader.setVec3("light.diffuse", light.color);
+		cubeShader.setVec3("light.specular", light.color);
+		cubeShader.setFloat("light.constant", light.constant);
+		cubeShader.setFloat("light.linear", light.linear);
+		cubeShader.setFloat("light.quadratic", light.quadratic);
 		cubeShader.setVec3("viewPos", camera.getPosition());
 		cubeShader.setMat4("model", model);
 		cubeShader.setMat4("view", view);
@@ -186,6 +207,35 @@ int main(void) {
 	return EXIT_SUCCESS;
 }
 
+void initGLFW() {
+	if (!glfwInit())
+		terminate(EXIT_FAILURE, "Failed to initialize GLFW");
+}
+
+GLFWwindow* initWindow() {
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, OPENGL_VERSION_MAJOR);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, OPENGL_VERSION_MINOR);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_SAMPLES, 4);
+	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, WINDOW_NAME, nullptr, nullptr);
+	if (!window)
+		terminate(EXIT_FAILURE, "Failed to create GLFW window");
+	glfwMakeContextCurrent(window);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	return window;
+}
+
+void initCallbacks(GLFWwindow* window) {
+	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+	glfwSetCursorPosCallback(window, mouseMovementCallback);
+	glfwSetScrollCallback(window, mouseScrollCallback);
+}
+
+void initGLAD() {
+	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
+		terminate(EXIT_FAILURE, "Failed to initialize GLAD");
+}
+
 void terminate(int code, std::string message) {
 	logger.log(message);
 	logger.log("Program exited with status " + std::to_string(code));
@@ -193,11 +243,29 @@ void terminate(int code, std::string message) {
 	exit(code);
 }
 
+void logSpecs() {
+	logger.log("GL vendor:", false, ' ');
+	logger.log(glGetString(GL_VENDOR), false);
+	logger.log("GL renderer:", false, ' ');
+	logger.log(glGetString(GL_RENDERER), false);
+	logger.log("GL version:", false, ' ');
+	logger.log(glGetString(GL_VERSION), false);
+	logger.log("GLSL version:", false, ' ');
+	logger.log(glGetString(GL_SHADING_LANGUAGE_VERSION), false);
+	logger.log("", false);
+}
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
 	windowWidth = width;
 	windowHeight = height;
 	aspectRatio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
+}
+
+void processTime() {
+	float currentFrame = static_cast<float>(glfwGetTime());
+	deltaTime = currentFrame - lastFrame;
+	lastFrame = currentFrame;
 }
 
 void processKeyboardInput(GLFWwindow* window) {
@@ -221,17 +289,17 @@ void processKeyboardInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_RELEASE)
 		resetKeyPressed = false;
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		lightPos.z -= LIGHT_MOVEMENT_SPEED * deltaTime;
+		light.position.z -= light.movementSpeed * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		lightPos.z += LIGHT_MOVEMENT_SPEED * deltaTime;
+		light.position.z += light.movementSpeed * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		lightPos.x -= LIGHT_MOVEMENT_SPEED * deltaTime;
+		light.position.x -= light.movementSpeed * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		lightPos.x += LIGHT_MOVEMENT_SPEED * deltaTime;
+		light.position.x += light.movementSpeed * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-		lightPos.y += LIGHT_MOVEMENT_SPEED * deltaTime;
+		light.position.y += light.movementSpeed * deltaTime;
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-		lightPos.y -= LIGHT_MOVEMENT_SPEED * deltaTime;
+		light.position.y -= light.movementSpeed * deltaTime;
 }
 
 void mouseMovementCallback(GLFWwindow* window, double posX, double posY) {
