@@ -21,6 +21,10 @@ Environment for creation, education, and experimentation with OpenGL.
 		<td>Arcball class that utilizes quaternions to rotate objects</td>
 	</tr>
 	<tr>
+		<td><a href="./include/opengl-sandbox/camera_arcball.h">Camera Arcball</a></td>
+		<td>Orbital camera derived from an arcball</td>
+	</tr>
+	<tr>
 		<th colspan=2>Programs</th>
 	</tr>
 	<tr>
@@ -32,16 +36,20 @@ Environment for creation, education, and experimentation with OpenGL.
 		<td>Rendering a cube via an element buffer object</td>
 	</tr>
 	<tr>
-		<td><a href="./src/cube_shaded">Cube shaded</a></td>
+		<td><a href="./src/cube_shaded">Cube Shaded</a></td>
 		<td>Rendering a cube shaded via the Blinn-Phong shading model</td>
 	</tr>
 	<tr>
-		<td><a href="./src/cube_textured">Cube textured</a></td>
+		<td><a href="./src/cube_textured">Cube Textured</a></td>
 		<td>Rendering a texture onto the surface of a cube shaded via the Blinn-Phong shading model</td>
 	</tr>
 	<tr>
-		<td><a href="./src/cube_arcball">Cube arcball</a></td>
+		<td><a href="./src/cube_arcball">Cube Arcball</a></td>
 		<td>Viewing a shaded, textured cube rotated via an arcball</td>
+	</tr>
+	<tr>
+		<td><a href="./src/cube_camera_arcball">Cube Camera Arcball</a></td>
+		<td>Viewing a shaded, textured cube via an orbital camera</td>
 	</tr>
 </table>
 
