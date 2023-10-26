@@ -104,10 +104,6 @@ float deltaTime = 0.0f;
 float lastFrame = 0.0f;
 // camera
 Camera camera(glm::vec3(0.0f, 0.0f, 7.0f));
-bool resetKeyPressed = false;
-bool firstMouse = true;
-float lastX = windowWidth / 2.0f;
-float lastY = windowHeight / 2.0f;
 // Arcball
 Arcball arcball;
 // logger
@@ -306,7 +302,7 @@ void mouseMovementCallback(GLFWwindow* window, double posX, double posY) {
 	float positionX = static_cast<float>(posX);
 	float positionY = static_cast<float>(posY);
 	glm::vec2 pos = arcball.screenToNDC(positionX, positionY, windowWidth, windowHeight);
-	if (arcball.getActiveStatus())
+	if (arcball.isRotating())
 		arcball.rotate(pos);
 }
 
