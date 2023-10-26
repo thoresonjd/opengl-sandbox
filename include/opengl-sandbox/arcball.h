@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <cmath>
+#include <algorithm>
 
 /**
  * @class Arcball - Represents an arcball and corresponding quaternion rotations.
@@ -75,13 +76,13 @@ public:
 	 * @param posX - The x-coordinate of the current cursor position
 	 * @param posY - The y-coordinate of the current cursor rotation
 	 */
-	void rotate(float posX, float posY);
+	virtual void rotate(float posX, float posY);
 
 	/**
 	 * Applies the current position to the ongoing quaternion rotation
 	 * @param pos - The current two-dimensional cursor position
 	 */
-	void rotate(glm::vec2 pos);
+	virtual void rotate(glm::vec2 pos);
 
 	/**
 	 * Completes the quaternion arcball rotation
@@ -129,86 +130,3 @@ public:
 };
 
 #endif
-
-Arcball::Arcball(
-	float radius,
-	bool invertY
-) : lastRotation(IDENTITY_QUATERNION), 
-	currentRotation(IDENTITY_QUATERNION),
-	start(glm::vec2(0.0f)),
-	end(glm::vec2(0.0f)),
-	radius(radius),
-	invertY(invertY) {
-}
-
-void Arcball::beginRotation(float posX, float posY) {
-	beginRotation(glm::vec2(posX, posY));
-}
-
-void Arcball::beginRotation(glm::vec2 pos) {
-	if (!invertY)
-		pos.y *= -1.0f;
-	start = pos;
-	isActive = true;
-}
-
-void Arcball::rotate(float posX, float posY) {
-	rotate(glm::vec2(posX, posY));
-}
-
-void Arcball::rotate(glm::vec2 pos) {
-	if (!invertY)
-		pos.y *= -1.0f;
-	end = pos;
-	currentRotation = computeRotationQuaternion(start, end);
-}
-
-void Arcball::endRotation() {
-	lastRotation = currentRotation * lastRotation;
-	currentRotation = IDENTITY_QUATERNION;
-	isActive = false;
-}
-
-glm::mat4 Arcball::getRotationMatrix() {
-	return glm::mat4_cast(currentRotation* lastRotation);
-};
-
-glm::vec2 Arcball::screenToNDC(float posX, float posY, int width, int height) {
-	return screenToNDC(glm::vec2(posX, posY), width, height);
-}
-
-glm::vec2 Arcball::screenToNDC(double posX, double posY, int width, int height) {
-	float posXf = static_cast<float>(posX);
-	float posYf = static_cast<float>(posY);
-	return screenToNDC(glm::vec2(posXf, posYf), width, height);
-}
-
-glm::vec2 Arcball::screenToNDC(glm::vec2 pos, int width, int height) {
-	float x = ((pos.x / static_cast<float>(width)) - 0.5f) * 2.0f;
-	float y = ((pos.y / static_cast<float>(height)) - 0.5f) * 2.0f;
-	return glm::vec2(x, y);
-}
-
-bool Arcball::getActiveStatus() const {
-	return isActive;
-}
-
-glm::quat Arcball::computeRotationQuaternion(glm::vec2 start, glm::vec2 end) const {
-	glm::vec3 startPos = mapToSurface(start);
-	glm::vec3 endPos = mapToSurface(end);
-	float startDotCurrent = glm::dot(startPos, endPos);
-	float startMagnitude = glm::length(startPos);
-	float endMagnitude = glm::length(endPos);
-	float angle = acos(std::min(startDotCurrent / (startMagnitude * endMagnitude), 1.0f));
-	glm::vec3 axis = glm::normalize(glm::cross(startPos, endPos));
-	return glm::normalize(glm::angleAxis(angle, axis));
-}
-
-glm::vec3 Arcball::mapToSurface(glm::vec2 pos) const {
-	float xSquared = pos.x * pos.x;
-	float ySquared = pos.y * pos.y;
-	float z = 0;
-	if (xSquared + ySquared <= radius)
-		z = sqrt(radius - xSquared - ySquared);
-	return glm::vec3(pos, z);
-}
