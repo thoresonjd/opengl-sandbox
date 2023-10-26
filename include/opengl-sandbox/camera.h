@@ -2,6 +2,7 @@
  * @file camera.h
  * @brief Flying free look camera
  * @date October 2023
+ * @see https://learnopengl.com/Getting-started/Camera
  */
 
 #ifndef CAMERA_H

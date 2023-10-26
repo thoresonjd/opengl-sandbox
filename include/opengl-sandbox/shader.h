@@ -2,6 +2,7 @@
  * @file shader.h
  * @brief Shader class supporting vertex and fragment shaders
  * @date October 2023
+ * @see https://learnopengl.com/Getting-started/Shaders
  */
 
 #ifndef SHADER_H
