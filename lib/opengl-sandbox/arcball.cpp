@@ -73,10 +73,10 @@ glm::vec2 Arcball::screenToNDC(glm::vec2 pos, int width, int height) {
 glm::quat Arcball::computeRotationQuaternion(glm::vec2 start, glm::vec2 end) const {
 	glm::vec3 startPos = mapToSurface(start);
 	glm::vec3 endPos = mapToSurface(end);
-	float startDotCurrent = glm::dot(startPos, endPos);
+	float startDotEnd = glm::dot(startPos, endPos);
 	float startMagnitude = glm::length(startPos);
 	float endMagnitude = glm::length(endPos);
-	float angle = acos(std::min(startDotCurrent / (startMagnitude * endMagnitude), 1.0f));
+	float angle = acos(std::min(startDotEnd / (startMagnitude * endMagnitude), 1.0f));
 	glm::vec3 axis = glm::normalize(glm::cross(startPos, endPos));
 	return glm::normalize(glm::angleAxis(angle, axis));
 }

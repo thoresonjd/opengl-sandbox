@@ -19,10 +19,13 @@
  * Uses the entire screen as the frame of reference via NDC.
  */
 class Arcball {
-protected:
+private:
 
 	static constexpr float DEFAULT_RADIUS = 1.0f;
 	static constexpr glm::quat IDENTITY_QUATERNION = glm::quat(1.0f, glm::vec3(0.0f));
+
+protected:
+
 	float radius;
 	glm::vec2 start;
 	glm::vec2 end;
