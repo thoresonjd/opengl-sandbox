@@ -51,6 +51,10 @@ Environment for creation, education, and experimentation with OpenGL.
 		<td><a href="./src/cube_camera_arcball">Cube Camera Arcball</a></td>
 		<td>Viewing a shaded, textured cube via an orbital camera</td>
 	</tr>
+	<tr>
+		<td><a href="./src/letters">Letters</a></td>
+		<td>Rendering letters: JDTII</td>
+	</tr>
 </table>
 
 ## Setup
