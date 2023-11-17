@@ -50,6 +50,7 @@ protected:
 	glm::vec3 mapToSurface(glm::vec2 pos) const;
 
 public:
+
 	/**
 	 * Default constructor
 	 * @param radius - The arcball radius
@@ -102,7 +103,7 @@ public:
 	/**
 	 * Returns the quaternion rotation as a four-by-four matrix
 	 */
-	glm::mat4 getRotationMatrix();
+	glm::mat4 getRotationMatrix() const;
 
 	/**
 	 * Converts a cursor position from screen coordinates to normalized device coordinates

@@ -64,9 +64,9 @@ float CameraArcball::getFOV() const {
 	return fieldOfView;
 }
 
-glm::vec3 CameraArcball::getPosition() {
-	// apply rotatation transpose to position to ensure proper coordinates upon return
-	return glm::vec3(glm::transpose(getRotationMatrix()) * glm::vec4(position, 1.0f));;
+glm::vec3 CameraArcball::getPosition() const {
+	// apply rotation transpose to position to ensure proper coordinates upon return
+	return glm::vec3(glm::transpose(getRotationMatrix()) * glm::vec4(position, 1.0f));
 }
 
 void CameraArcball::updateCameraVectors() {

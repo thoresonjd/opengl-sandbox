@@ -115,7 +115,7 @@ public:
 	/**
 	 * Retrives the position of the camera
 	 */
-	glm::vec3 getPosition();
+	glm::vec3 getPosition() const;
 };
 
 #endif

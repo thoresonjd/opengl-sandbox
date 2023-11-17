@@ -50,7 +50,7 @@ bool Arcball::isRotating() const {
 	return rotating;
 }
 
-glm::mat4 Arcball::getRotationMatrix() {
+glm::mat4 Arcball::getRotationMatrix() const {
 	return glm::mat4_cast(currentRotation * lastRotation);
 };
 
